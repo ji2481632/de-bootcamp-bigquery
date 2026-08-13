@@ -30,7 +30,7 @@ jobs:
 
       - name: Check BigQuery connection
         run: |
-          bq --version
+          bq version
           gcloud auth list
 
       - name: Execute SQL
