@@ -61,8 +61,9 @@ jobs:
             echo "======================================"
 
             # Replace project placeholder
-            sed "s/__GCP_PROJECT_ID__/${GCP_PROJECT_ID}/g" "$file" > /tmp/$(basename "$file")
-            sed "s/__SCHEMA__/${TABSCHEMA}/g"              "$file" > /tmp/$(basename "$file")
+            cat "$file" | \
+            sed "s/__GCP_PROJECT_ID__/${GCP_PROJECT_ID}/g" | \
+            sed "s/__SCHEMA__/${TABSCHEMA}/g"  > /tmp/$(basename "$file")
 
             # Execute SQL
             bq query --use_legacy_sql=false --project_id="${GCP_PROJECT_ID}" < /tmp/$(basename "$file")
