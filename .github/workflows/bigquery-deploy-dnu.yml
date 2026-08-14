@@ -1,0 +1,70 @@
+name: BigQuery Deployment
+
+on:
+  push:
+    branches:
+      - develop-dnu
+      - main-dnu
+
+jobs:
+
+  deploy:
+    runs-on: ubuntu-latest
+
+    permissions:
+      contents: read
+      id-token: write
+
+    steps:
+
+      - name: Checkout repository
+        uses: actions/checkout@v6
+      # Select GCP project based on branch
+      - name: Set environment
+        run: |
+          if [[ "${GITHUB_REF_NAME}" == "main" ]]; then
+            echo "ENVIORNMENT-PRD"                                             >> $GITHUB_ENV
+            echo        "GCP_PROJECT_ID=${{ vars.PRD_GCP_PROJECT_ID }}"        >> $GITHUB_ENV
+            echo   "GCP_SERVICE_ACCOUNT=${{ vars.PRD_GCP_SERVICE_ACCOUNT }}"   >> $GITHUB_ENV
+            echo "GCP_WORKLOAD_PROVIDER=${{ vars.PRD_GCP_WORKLOAD_PROVIDER }}" >> $GITHUB_ENV
+          elif [[ "${GITHUB_REF_NAME}" == "develop" ]]; then
+            echo "ENVIORNMENT-DEV"                                             >> $GITHUB_ENV
+            echo        "GCP_PROJECT_ID=${{ vars.DEV_GCP_PROJECT_ID }}"        >> $GITHUB_ENV
+            echo   "GCP_SERVICE_ACCOUNT=${{ vars.DEV_GCP_SERVICE_ACCOUNT }}"   >> $GITHUB_ENV
+            echo "GCP_WORKLOAD_PROVIDER=${{ vars.DEV_GCP_WORKLOAD_PROVIDER }}" >> $GITHUB_ENV
+          fi
+
+      - name: Authenticate to Google Cloud
+        uses: google-github-actions/auth@v2
+        with:
+          workload_identity_provider: ${{ env.GCP_WORKLOAD_PROVIDER }}
+          service_account: ${{ env.GCP_SERVICE_ACCOUNT }}
+
+      - name: Setup Google Cloud CLI
+        uses: google-github-actions/setup-gcloud@v3
+
+      - name: Check BigQuery connection
+        run: |
+          bq version
+          gcloud auth list
+
+      - name: Execute SQL
+        run: |
+          for file in sql/*.sql; do
+
+            echo "======================================"
+            echo "Executing $file"
+            echo "Environment: ${ENVIRONMENT}"
+            echo "Project: ${GCP_PROJECT_ID}"
+            echo "======================================"
+
+            # Replace project placeholder
+            sed "s/__GCP_PROJECT_ID__/${GCP_PROJECT_ID}/g" "$file" > /tmp/$(basename "$file")
+
+            # Execute SQL
+            bq query \
+              --use_legacy_sql=false \
+              --project_id="${GCP_PROJECT_ID}" \
+              < /tmp/$(basename "$file")
+
+          done

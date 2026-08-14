@@ -37,7 +37,5 @@ jobs:
         run: |
           for file in sql/*.sql; do
             echo "Executing $file"
-            bq query \
-              --use_legacy_sql=false \
-              < "$file"
+            bq query --use_legacy_sql=false < "$file"
           done
