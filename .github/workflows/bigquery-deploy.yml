@@ -23,12 +23,12 @@ jobs:
       - name: Set environment
         run: |
           if [[ "${GITHUB_REF_NAME}" == "main" ]]; then
-            echo "ENVIORNMENT-PRD"                                             >> $GITHUB_ENV
+            echo           "ENVIRONMENT='ENVIORNMENT-PRD'"                     >> $GITHUB_ENV
             echo        "GCP_PROJECT_ID=${{ vars.PRD_GCP_PROJECT_ID }}"        >> $GITHUB_ENV
             echo   "GCP_SERVICE_ACCOUNT=${{ vars.PRD_GCP_SERVICE_ACCOUNT }}"   >> $GITHUB_ENV
             echo "GCP_WORKLOAD_PROVIDER=${{ vars.PRD_GCP_WORKLOAD_PROVIDER }}" >> $GITHUB_ENV
           elif [[ "${GITHUB_REF_NAME}" == "develop" ]]; then
-            echo "ENVIORNMENT-DEV"                                             >> $GITHUB_ENV
+            echo           "ENVIRONMENT='ENVIORNMENT-dev'"                     >> $GITHUB_ENV
             echo        "GCP_PROJECT_ID=${{ vars.DEV_GCP_PROJECT_ID }}"        >> $GITHUB_ENV
             echo   "GCP_SERVICE_ACCOUNT=${{ vars.DEV_GCP_SERVICE_ACCOUNT }}"   >> $GITHUB_ENV
             echo "GCP_WORKLOAD_PROVIDER=${{ vars.DEV_GCP_WORKLOAD_PROVIDER }}" >> $GITHUB_ENV
