@@ -3,8 +3,8 @@ name: BigQuery Deployment
 on:
   push:
     branches:
-      - develop
-      - main
+      - develop-dnu
+      - main-dnu
 
 jobs:
 
