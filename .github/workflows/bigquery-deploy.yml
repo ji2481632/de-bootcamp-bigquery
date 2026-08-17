@@ -22,14 +22,14 @@ jobs:
       # Select GCP project based on branch
       - name: Set environment
         run: |
-          if [[ "${GITHUB_REF_NAME}" == "main" ]]; then
-            echo           "ENVIRONMENT='ENVIORNMENT-PRD'"                     >> $GITHUB_ENV
+          if   [[ "${GITHUB_REF_NAME}" == "main" ]]; then
+            echo           "ENVIRONMENT=ENVIORNMENT-PRD"                       >> $GITHUB_ENV
             echo             "TABSCHEMA=retail_prd"                            >> $GITHUB_ENV
             echo        "GCP_PROJECT_ID=${{ vars.PRD_GCP_PROJECT_ID }}"        >> $GITHUB_ENV
             echo   "GCP_SERVICE_ACCOUNT=${{ vars.PRD_GCP_SERVICE_ACCOUNT }}"   >> $GITHUB_ENV
             echo "GCP_WORKLOAD_PROVIDER=${{ vars.PRD_GCP_WORKLOAD_PROVIDER }}" >> $GITHUB_ENV
           elif [[ "${GITHUB_REF_NAME}" == "develop" ]]; then
-            echo           "ENVIRONMENT='ENVIORNMENT-dev'"                     >> $GITHUB_ENV
+            echo           "ENVIRONMENT=ENVIORNMENT-DEV"                       >> $GITHUB_ENV
             echo             "TABSCHEMA=retail_dev"                            >> $GITHUB_ENV
             echo        "GCP_PROJECT_ID=${{ vars.DEV_GCP_PROJECT_ID }}"        >> $GITHUB_ENV
             echo   "GCP_SERVICE_ACCOUNT=${{ vars.DEV_GCP_SERVICE_ACCOUNT }}"   >> $GITHUB_ENV
@@ -61,10 +61,11 @@ jobs:
             echo "Schema: ${TABSCHEMA}"
             echo "======================================"
 
-            # Replace project placeholder
+            # Replace placeholders with variable values
             cat "$file" | \
             sed "s/__GCP_PROJECT_ID__/${GCP_PROJECT_ID}/g" | \
-            sed "s/__SCHEMA__/${TABSCHEMA}/g"  > /tmp/$(basename "$file")
+            sed "s/__SCHEMA__/${TABSCHEMA}/g" | \
+            sed "s/__ENVNAME__/${ENVIRONMENT}/g" > /tmp/$(basename "$file")
 
             cat /tmp/$(basename "$file")
             echo "======================================"
